@@ -1,0 +1,8 @@
+<resources>
+    <style name="Theme.AidFinder" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/accent</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="android:colorBackground">@color/paper</item>
+        <item name="android:textColorPrimary">@color/ink</item>
+    </style>
+</resources>
