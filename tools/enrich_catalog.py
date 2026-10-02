@@ -24,9 +24,9 @@ import sys
 from datetime import date
 from pathlib import Path
 
-from anthropic import Anthropic
 from dotenv import load_dotenv
 
+from llm import LLM
 from sources.base import RawProduct
 from sources.seedfile import SeedFileSource
 
@@ -36,7 +36,6 @@ log = logging.getLogger("enrich")
 
 CATALOG = Path("../android-app/app/src/main/assets/catalog.json")
 REVIEW_QUEUE = Path("review_queue.csv")
-MODEL = "claude-sonnet-4-5"
 
 SYSTEM = """You write product descriptions for an app that helps people find \
 assistive products - things that make daily tasks easier for people with \
@@ -75,7 +74,7 @@ Respond with JSON only, no fences:
 """
 
 
-def describe(client: Anthropic, product: RawProduct) -> dict | None:
+def describe(llm: LLM, product: RawProduct) -> dict | None:
     prompt = (
         f"Title: {product.title}\n"
         f"Brand: {product.brand or 'unknown'}\n"
@@ -85,28 +84,10 @@ def describe(client: Anthropic, product: RawProduct) -> dict | None:
         f"Search term that found it: {product.extra.get('search_term', 'n/a')}"
     )
 
-    try:
-        response = client.messages.create(
-            model=MODEL,
-            max_tokens=600,
-            system=SYSTEM,
-            messages=[{"role": "user", "content": prompt}],
-        )
-    except Exception:
-        log.exception("Model call failed for %s", product.title[:50])
-        return None
-
-    text = "".join(b.text for b in response.content if b.type == "text").strip()
-    if text.startswith("```"):
-        text = text.split("```")[1]
-        if text.startswith("json"):
-            text = text[4:]
-
-    try:
-        return json.loads(text.strip())
-    except json.JSONDecodeError:
-        log.warning("Unparseable response for %s: %s", product.title[:40], text[:120])
-        return None
+    result = llm.ask_json(SYSTEM, prompt)
+    if result is None:
+        log.warning("No usable response for %s", product.title[:50])
+    return result
 
 
 def load_catalog() -> dict:
@@ -149,7 +130,7 @@ def main() -> int:
 
     log.info("Fetched %d products", len(raw))
 
-    client = Anthropic()
+    llm = LLM()
     catalog = load_catalog()
     review_rows = []
     added = updated = skipped = 0
@@ -169,7 +150,7 @@ def main() -> int:
                 updated += 1
             continue
 
-        result = describe(client, product)
+        result = describe(llm, product)
         if result is None:
             skipped += 1
             continue

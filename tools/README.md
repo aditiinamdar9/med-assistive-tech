@@ -7,10 +7,26 @@ app, and neither runs when a user taps anything.
 
 ```bash
 cd tools
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-cp ../.env.example .env     # add ANTHROPIC_API_KEY
+python3 -m venv .venv && source .venv/bin/activate
+python -m pip install -r requirements.txt
+cp .env.template .env       # then add ONE api key
 ```
+
+### Which model provider
+
+The pipeline works with either Anthropic or OpenAI. Put one key in `.env`:
+
+```
+ANTHROPIC_API_KEY=sk-ant-...     # or
+OPENAI_API_KEY=sk-proj-...
+```
+
+Whichever is present gets used. If both are, set `LLM_PROVIDER=openai` to
+choose. Override the model with `LLM_MODEL=` — defaults are
+`claude-sonnet-4-5` and `gpt-4o-mini`.
+
+All of this lives in `llm.py`. The rest of the pipeline does not know which
+provider is in use, so switching costs you one line in `.env`.
 
 ## enrich_catalog.py
 
