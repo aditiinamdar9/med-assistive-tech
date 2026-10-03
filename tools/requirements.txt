@@ -1,0 +1,7 @@
+# Model providers - you only need the one you have a key for,
+# but installing both is harmless and lets you switch freely.
+anthropic>=0.40
+openai>=1.50
+
+requests==2.32.3
+python-dotenv==1.0.1
