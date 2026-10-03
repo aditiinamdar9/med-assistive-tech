@@ -1,0 +1,47 @@
+[
+  {
+    "id": "grip-001",
+    "name": "Weighted utility grips",
+    "category": "physical",
+    "tags": "grip-weakness,arthritis,hands",
+    "description": "Chunky rubber handles that slide onto forks, pens and toothbrushes so they are easier to hold when your hands are sore or weak.",
+    "price": 18.99,
+    "buyUrl": ""
+  },
+  {
+    "id": "vis-001",
+    "name": "Handheld lighted magnifier",
+    "category": "physical",
+    "tags": "low-vision,reading",
+    "description": "A magnifying glass with a built-in light. Helps with small print on labels, menus and mail.",
+    "price": 24.50,
+    "buyUrl": ""
+  },
+  {
+    "id": "sen-001",
+    "name": "Noise-reducing earplugs",
+    "category": "mental",
+    "tags": "sensory-overload,anxiety,noise",
+    "description": "Reusable earplugs that turn the volume of a room down without blocking it out, for places that feel too loud or too busy.",
+    "price": 27.00,
+    "buyUrl": ""
+  },
+  {
+    "id": "mem-001",
+    "name": "Talking pill reminder box",
+    "category": "mental",
+    "tags": "memory,routine,medication",
+    "description": "A pill box that says out loud which compartment to open and when, so you do not have to keep track yourself.",
+    "price": 39.95,
+    "buyUrl": ""
+  },
+  {
+    "id": "reach-001",
+    "name": "Folding reacher grabber",
+    "category": "physical",
+    "tags": "reach,bending,mobility,back-pain",
+    "description": "A long arm with a trigger and a gripper on the end, for picking things up off the floor or off a high shelf without bending or climbing.",
+    "price": 21.00,
+    "buyUrl": ""
+  }
+]

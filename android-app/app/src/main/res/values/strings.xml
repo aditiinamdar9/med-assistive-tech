@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Aid Finder</string>
+
+    <string name="headline">Find something that helps</string>
+    <string name="lede">Describe what you find hard in a normal day. We\'ll suggest a few things that might make it easier.</string>
+    <string name="input_label">What is giving you trouble?</string>
+    <string name="input_hint">Opening jars and holding a pen makes my hands ache.</string>
+    <string name="find_button">Find suggestions</string>
+    <string name="searching">Looking…</string>
+
+    <string name="empty_input">Tell us what is going on first.</string>
+    <string name="no_matches">Nothing in our list matched. Try describing one specific task you struggle with.</string>
+    <string name="offline">No connection. Check your wifi and try again.</string>
+    <string name="service_down">Suggestions are unavailable right now. Try again in a minute.</string>
+
+    <string name="disclaimer">This app suggests products. It is not a medical service and does not diagnose anything. If something is getting worse, talk to a doctor.</string>
+
+    <string name="cd_results_list">List of suggested products</string>
+</resources>
