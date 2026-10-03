@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Medical Assistive Technology</string>
+    <string name="title_login">Welcome Back</string>
+    <string name="title_register">Create Account</string>
+    <string name="title_home">Home Dashboard</string>
+    <string name="hint_username">Username</string>
+    <string name="hint_username_or_email">Username or Email</string>
+    <string name="hint_email">Email Address</string>
+    <string name="hint_password">Password</string>
+    <string name="hint_confirm_password">Confirm Password</string>
+    <string name="btn_login">Login</string>
+    <string name="btn_register">Register</string>
+    <string name="btn_logout">Logout</string>
+    <string name="link_register">Don\'t have an account? Register here</string>
+    <string name="link_login">Already have an account? Login here</string>
+    <string name="err_empty_fields">Please fill in all fields</string>
+    <string name="err_invalid_credentials">Invalid username/email or password</string>
+    <string name="err_password_mismatch">Passwords do not match</string>
+    <string name="err_user_exists">Username or Email already registered</string>
+    <string name="msg_register_success">Account registered successfully!</string>
+    <string name="msg_welcome">Welcome, %1$s!</string>
+</resources>
