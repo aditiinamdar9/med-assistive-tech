@@ -1,5 +1,5 @@
 """
-All Anthropic API contact lives here.
+All OpenAI API contact lives here.
 
 Design rule: the model chooses ids from a catalog we hand it, and we validate
 every id it returns against that same catalog before replying. The Android app
@@ -10,14 +10,23 @@ product reaching a user is the worst thing this app could do.
 import json
 import logging
 
-from anthropic import Anthropic, APIError
+from openai import APIError, OpenAI
 
 from .config import settings
 from .prompts import SYSTEM_PROMPT
 from .schemas import CatalogItem, Recommendation, RecommendRequest
 
 log = logging.getLogger(__name__)
-_client = Anthropic(api_key=settings.anthropic_api_key)
+_client: OpenAI | None = None
+
+
+def _get_client() -> OpenAI:
+    """Built on first use, not at import time - importing this module (e.g.
+    to test _parse) should not require a real API key to be set."""
+    global _client
+    if _client is None:
+        _client = OpenAI(api_key=settings.openai_api_key)
+    return _client
 
 
 def _catalog_block(catalog: list[CatalogItem]) -> str:
@@ -50,19 +59,23 @@ def recommend(req: RecommendRequest) -> list[Recommendation]:
     )
 
     try:
-        response = _client.messages.create(
+        response = _get_client().chat.completions.create(
             model=settings.model,
             max_tokens=settings.max_tokens,
-            system=SYSTEM_PROMPT.format(max_picks=settings.max_picks),
-            messages=[{"role": "user", "content": user_message}],
+            # Guarantees syntactically valid JSON. The word "JSON" must appear
+            # in one of the messages or the API rejects the request - our
+            # system prompt says "Respond with JSON only", so that's covered.
+            response_format={"type": "json_object"},
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT.format(max_picks=settings.max_picks)},
+                {"role": "user", "content": user_message},
+            ],
         )
     except APIError:
-        log.exception("Anthropic API call failed")
+        log.exception("OpenAI API call failed")
         raise
 
-    raw_text = "".join(
-        block.text for block in response.content if block.type == "text"
-    )
+    raw_text = response.choices[0].message.content or ""
 
     picks: list[Recommendation] = []
     for item in _parse(raw_text):

@@ -4,8 +4,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     """Reads from environment variables or a .env file."""
 
-    anthropic_api_key: str = ""
-    model: str = "claude-sonnet-4-5"
+    openai_api_key: str = ""
+    model: str = "gpt-4o-mini"
     max_tokens: int = 1000
     max_picks: int = 3
 
