@@ -20,5 +20,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Account screens: compiled in, not yet reachable from MainActivity -->
+        <activity android:name=".auth.LoginActivity" android:exported="false" />
+        <activity android:name=".auth.RegisterActivity" android:exported="false" />
+        <activity android:name=".auth.HomeActivity" android:exported="false" />
     </application>
 </manifest>
