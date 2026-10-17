@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.aidfinder.MainActivity;
 import com.aidfinder.auth.db.DatabaseHelper;
 import com.aidfinder.R;
 
@@ -49,9 +50,7 @@ public class LoginActivity extends AppCompatActivity {
 
         boolean isValid = databaseHelper.checkUser(loginInput, password);
         if (isValid) {
-            String username = databaseHelper.getUsernameByLoginInput(loginInput);
-            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-            intent.putExtra("USERNAME", username);
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(intent);
             finish();
         } else {
