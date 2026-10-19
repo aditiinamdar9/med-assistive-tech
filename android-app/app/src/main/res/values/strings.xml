@@ -37,4 +37,25 @@
     <string name="err_user_exists">Username or Email already registered</string>
     <string name="msg_register_success">Account registered successfully!</string>
     <string name="msg_welcome">Welcome, %1$s!</string>
+
+    <!-- Profile & Health Vitals -->
+    <string name="title_profile">My Profile</string>
+    <string name="msg_profile_greeting">Hello, %1$s!</string>
+    <string name="section_basic_info">Basic Information</string>
+    <string name="section_vitals">Optional Health Vitals</string>
+    <string name="label_biological_sex">Biological Sex</string>
+    <string name="sex_female">Female</string>
+    <string name="sex_male">Male</string>
+    <string name="hint_age">Age</string>
+    <string name="hint_height_ft">Height (ft)</string>
+    <string name="hint_height_in">Height (in)</string>
+    <string name="hint_weight_lbs">Weight (lbs)</string>
+    <string name="hint_blood_pressure">Blood Pressure (e.g. 120/80)</string>
+    <string name="hint_heart_rate">Heart Rate (bpm)</string>
+    <string name="hint_activity_level">Activity Level (e.g. Moderately Active)</string>
+    <string name="btn_save_profile">Save Profile</string>
+    <string name="btn_my_profile">My Profile</string>
+    <string name="btn_search_products">Find Assistive Products</string>
+    <string name="msg_profile_saved">Profile saved successfully!</string>
+    <string name="err_invalid_number">Please enter valid numeric values for age, height, or weight</string>
 </resources>

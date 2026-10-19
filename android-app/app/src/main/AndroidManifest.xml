@@ -26,6 +26,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".auth.RegisterActivity" android:exported="false" />
-        <activity android:name=".auth.HomeActivity" android:exported="false" />
+        <activity android:name=".auth.HomeActivity" android:exported="true" />
+        <activity android:name=".auth.ProfileActivity" android:exported="true" />
     </application>
 </manifest>
