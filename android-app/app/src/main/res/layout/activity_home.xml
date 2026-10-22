@@ -20,6 +20,24 @@
         android:layout_marginBottom="32dp" />
 
     <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnProfile"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="@string/btn_my_profile"
+        android:textSize="16sp"
+        app:cornerRadius="8dp"
+        android:layout_marginBottom="16dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSearchProducts"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="@string/btn_search_products"
+        android:textSize="16sp"
+        app:cornerRadius="8dp"
+        android:layout_marginBottom="16dp" />
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnLogout"
         android:layout_width="match_parent"
         android:layout_height="56dp"

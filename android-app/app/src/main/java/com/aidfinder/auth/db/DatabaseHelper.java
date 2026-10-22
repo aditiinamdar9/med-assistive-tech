@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.aidfinder.auth.model.UserProfile;
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -14,13 +16,23 @@ import java.security.SecureRandom;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "UserDatabase.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
 
     private static final String TABLE_USERS = "users";
     private static final String COLUMN_ID = "id";
     private static final String COLUMN_USERNAME = "username";
     private static final String COLUMN_EMAIL = "email";
     private static final String COLUMN_PASSWORD = "password";
+
+    // Profile & Vitals columns
+    private static final String COLUMN_BIOLOGICAL_SEX = "biological_sex";
+    private static final String COLUMN_AGE = "age";
+    private static final String COLUMN_HEIGHT_FEET = "height_feet";
+    private static final String COLUMN_HEIGHT_INCHES = "height_inches";
+    private static final String COLUMN_WEIGHT_LBS = "weight_lbs";
+    private static final String COLUMN_BLOOD_PRESSURE = "blood_pressure";
+    private static final String COLUMN_HEART_RATE = "heart_rate";
+    private static final String COLUMN_ACTIVITY_LEVEL = "activity_level";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -32,14 +44,35 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + COLUMN_USERNAME + " TEXT UNIQUE,"
                 + COLUMN_EMAIL + " TEXT UNIQUE,"
-                + COLUMN_PASSWORD + " TEXT" + ")";
+                + COLUMN_PASSWORD + " TEXT,"
+                + COLUMN_BIOLOGICAL_SEX + " TEXT,"
+                + COLUMN_AGE + " INTEGER,"
+                + COLUMN_HEIGHT_FEET + " INTEGER,"
+                + COLUMN_HEIGHT_INCHES + " INTEGER,"
+                + COLUMN_WEIGHT_LBS + " REAL,"
+                + COLUMN_BLOOD_PRESSURE + " TEXT,"
+                + COLUMN_HEART_RATE + " INTEGER,"
+                + COLUMN_ACTIVITY_LEVEL + " TEXT" + ")";
         db.execSQL(CREATE_USERS_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
-        onCreate(db);
+        if (oldVersion < 2) {
+            db.execSQL("ALTER TABLE " + TABLE_USERS + " ADD COLUMN " + COLUMN_BIOLOGICAL_SEX + " TEXT");
+            db.execSQL("ALTER TABLE " + TABLE_USERS + " ADD COLUMN " + COLUMN_AGE + " INTEGER");
+            db.execSQL("ALTER TABLE " + TABLE_USERS + " ADD COLUMN " + COLUMN_HEIGHT_FEET + " INTEGER");
+            db.execSQL("ALTER TABLE " + TABLE_USERS + " ADD COLUMN " + COLUMN_HEIGHT_INCHES + " INTEGER");
+            db.execSQL("ALTER TABLE " + TABLE_USERS + " ADD COLUMN " + COLUMN_WEIGHT_LBS + " REAL");
+            db.execSQL("ALTER TABLE " + TABLE_USERS + " ADD COLUMN " + COLUMN_BLOOD_PRESSURE + " TEXT");
+            db.execSQL("ALTER TABLE " + TABLE_USERS + " ADD COLUMN " + COLUMN_HEART_RATE + " INTEGER");
+            db.execSQL("ALTER TABLE " + TABLE_USERS + " ADD COLUMN " + COLUMN_ACTIVITY_LEVEL + " TEXT");
+        } else if (oldVersion < 3) {
+            db.execSQL("ALTER TABLE " + TABLE_USERS + " ADD COLUMN " + COLUMN_BIOLOGICAL_SEX + " TEXT");
+            db.execSQL("ALTER TABLE " + TABLE_USERS + " ADD COLUMN " + COLUMN_HEIGHT_FEET + " INTEGER");
+            db.execSQL("ALTER TABLE " + TABLE_USERS + " ADD COLUMN " + COLUMN_HEIGHT_INCHES + " INTEGER");
+            db.execSQL("ALTER TABLE " + TABLE_USERS + " ADD COLUMN " + COLUMN_WEIGHT_LBS + " REAL");
+        }
     }
 
     public boolean addUser(String username, String email, String password) {
@@ -104,6 +137,98 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         db.close();
         return resolvedUsername;
+    }
+
+    public boolean saveUserProfile(UserProfile profile) {
+        if (profile == null || profile.getUsername() == null || profile.getUsername().isEmpty()) {
+            return false;
+        }
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_BIOLOGICAL_SEX, profile.getBiologicalSex());
+        values.put(COLUMN_AGE, profile.getAge());
+        values.put(COLUMN_HEIGHT_FEET, profile.getHeightFeet());
+        values.put(COLUMN_HEIGHT_INCHES, profile.getHeightInches());
+        values.put(COLUMN_WEIGHT_LBS, profile.getWeightLbs());
+        values.put(COLUMN_BLOOD_PRESSURE, profile.getBloodPressure());
+        values.put(COLUMN_HEART_RATE, profile.getHeartRate());
+        values.put(COLUMN_ACTIVITY_LEVEL, profile.getActivityLevel());
+
+        int rows = db.update(TABLE_USERS, values, COLUMN_USERNAME + " = ?", new String[]{profile.getUsername()});
+        if (rows == 0) {
+            values.put(COLUMN_USERNAME, profile.getUsername());
+            if (profile.getEmail() != null) {
+                values.put(COLUMN_EMAIL, profile.getEmail());
+            }
+            long id = db.insertWithOnConflict(TABLE_USERS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+            db.close();
+            return id != -1;
+        }
+        db.close();
+        return true;
+    }
+
+    public UserProfile getUserProfile(String username) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String selection = COLUMN_USERNAME + " = ?";
+        String[] selectionArgs = {username};
+
+        Cursor cursor = db.query(TABLE_USERS, null, selection, selectionArgs, null, null, null);
+        UserProfile profile = new UserProfile();
+        profile.setUsername(username);
+
+        if (cursor.moveToFirst()) {
+            profile.setEmail(getStringValue(cursor, COLUMN_EMAIL));
+            String bioSex = getStringValue(cursor, COLUMN_BIOLOGICAL_SEX);
+            if (bioSex.isEmpty()) {
+                bioSex = getStringValue(cursor, "gender");
+            }
+            profile.setBiologicalSex(bioSex);
+            profile.setAge(getIntValue(cursor, COLUMN_AGE));
+            profile.setHeightFeet(getIntValue(cursor, COLUMN_HEIGHT_FEET));
+            profile.setHeightInches(getIntValue(cursor, COLUMN_HEIGHT_INCHES));
+            profile.setWeightLbs(getDoubleValue(cursor, COLUMN_WEIGHT_LBS));
+            profile.setBloodPressure(getStringValue(cursor, COLUMN_BLOOD_PRESSURE));
+            profile.setHeartRate(getIntValue(cursor, COLUMN_HEART_RATE));
+            profile.setActivityLevel(getStringValue(cursor, COLUMN_ACTIVITY_LEVEL));
+        }
+        cursor.close();
+        db.close();
+
+        return profile;
+    }
+
+    public boolean updateProfileField(String username, String columnName, Object value) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        if (value instanceof Integer) {
+            values.put(columnName, (Integer) value);
+        } else if (value instanceof Double) {
+            values.put(columnName, (Double) value);
+        } else if (value != null) {
+            values.put(columnName, value.toString());
+        } else {
+            values.putNull(columnName);
+        }
+
+        int rows = db.update(TABLE_USERS, values, COLUMN_USERNAME + " = ?", new String[]{username});
+        db.close();
+        return rows > 0;
+    }
+
+    private String getStringValue(Cursor cursor, String columnName) {
+        int index = cursor.getColumnIndex(columnName);
+        return (index != -1 && !cursor.isNull(index)) ? cursor.getString(index) : "";
+    }
+
+    private int getIntValue(Cursor cursor, String columnName) {
+        int index = cursor.getColumnIndex(columnName);
+        return (index != -1 && !cursor.isNull(index)) ? cursor.getInt(index) : 0;
+    }
+
+    private double getDoubleValue(Cursor cursor, String columnName) {
+        int index = cursor.getColumnIndex(columnName);
+        return (index != -1 && !cursor.isNull(index)) ? cursor.getDouble(index) : 0.0;
     }
 
     /**
