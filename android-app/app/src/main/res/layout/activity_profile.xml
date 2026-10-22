@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="#F8F9FA">
+    android:background="@color/paper">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,12 +15,12 @@
         <!-- Greeting Header -->
         <TextView
             android:id="@+id/tvProfileGreeting"
+            style="@style/TextAppearance.AidFinder.Display"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/msg_profile_greeting"
             android:textSize="26sp"
-            android:textStyle="bold"
-            android:textColor="#1A1A1A"
+            android:textColor="@color/ink"
             android:layout_marginBottom="24dp" />
 
         <!-- Section 1: Basic Information -->
@@ -30,7 +30,7 @@
             android:text="@string/section_basic_info"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="#1A1A1A"
+            android:textColor="@color/ink"
             android:layout_marginBottom="12dp" />
 
         <!-- Biological Sex Multiple Choice Selection -->
@@ -39,7 +39,7 @@
             android:layout_height="wrap_content"
             android:text="@string/label_biological_sex"
             android:textSize="14sp"
-            android:textColor="#555555"
+            android:textColor="@color/muted"
             android:layout_marginBottom="4dp" />
 
         <RadioGroup
@@ -140,7 +140,7 @@
             android:text="@string/section_vitals"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="#1A1A1A"
+            android:textColor="@color/ink"
             android:layout_marginBottom="12dp" />
 
         <com.google.android.material.textfield.TextInputLayout
