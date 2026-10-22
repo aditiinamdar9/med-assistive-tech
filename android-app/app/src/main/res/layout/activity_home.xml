@@ -6,16 +6,16 @@
     android:orientation="vertical"
     android:padding="24dp"
     android:gravity="center"
-    android:background="#F8F9FA">
+    android:background="@color/paper">
 
     <TextView
         android:id="@+id/tvWelcomeMessage"
+        style="@style/TextAppearance.AidFinder.Display"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/title_home"
-        android:textSize="26sp"
-        android:textStyle="bold"
-        android:textColor="#1A1A1A"
+        android:textSize="28sp"
+        android:textColor="@color/ink"
         android:textAlignment="center"
         android:layout_marginBottom="32dp" />
 
