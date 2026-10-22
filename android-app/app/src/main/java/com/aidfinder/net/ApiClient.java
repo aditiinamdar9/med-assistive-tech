@@ -1,6 +1,9 @@
 package com.aidfinder.net;
 
+import android.content.Context;
+
 import com.aidfinder.BuildConfig;
+import com.aidfinder.config.AppConfig;
 
 import java.util.concurrent.TimeUnit;
 
@@ -12,15 +15,28 @@ import retrofit2.converter.gson.GsonConverterFactory;
 /**
  * Builds the one Retrofit client the app uses.
  *
- * The base URL comes from BuildConfig, so a debug build talks to your laptop
- * and a release build talks to your hosted service without changing any code.
+ * The base URL and app token come from AppConfig (supporting runtime overrides
+ * and falling back to BuildConfig).
  */
 public class ApiClient {
 
     private static AiApi api;
+    private static String currentBaseUrl;
 
     public static synchronized AiApi get() {
-        if (api == null) {
+        return get(null);
+    }
+
+    public static synchronized AiApi get(Context context) {
+        String baseUrl = context != null
+                ? AppConfig.getInstance(context).getBaseUrl()
+                : BuildConfig.AI_BASE_URL;
+        String appToken = context != null
+                ? AppConfig.getInstance(context).getAppToken()
+                : BuildConfig.APP_TOKEN;
+
+        if (api == null || !baseUrl.equals(currentBaseUrl)) {
+            currentBaseUrl = baseUrl;
             HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
             logging.setLevel(BuildConfig.DEBUG
                     ? HttpLoggingInterceptor.Level.BODY
@@ -32,12 +48,12 @@ public class ApiClient {
                     .addInterceptor(logging)
                     .addInterceptor(chain -> chain.proceed(
                             chain.request().newBuilder()
-                                    .addHeader("X-App-Token", BuildConfig.APP_TOKEN)
+                                    .addHeader("X-App-Token", appToken)
                                     .build()))
                     .build();
 
             api = new Retrofit.Builder()
-                    .baseUrl(BuildConfig.AI_BASE_URL)
+                    .baseUrl(baseUrl)
                     .client(http)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()

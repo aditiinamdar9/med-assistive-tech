@@ -16,6 +16,7 @@ venv/
 
 # Editor
 .vscode/
+.idea/
 
 # Android
 android-app/.gradle/
