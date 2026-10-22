@@ -13,13 +13,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.aidfinder.R;
 import com.aidfinder.RecommendationViewModel;
+import com.aidfinder.auth.UserSession;
+import com.aidfinder.auth.db.DatabaseHelper;
 import com.aidfinder.databinding.FragmentSearchBinding;
 
 public class SearchFragment extends Fragment {
 
     private FragmentSearchBinding views;
     private RecommendationViewModel model;
-    private final RecommendationAdapter adapter = new RecommendationAdapter();
+    private RecommendationAdapter adapter;
 
     public SearchFragment() {
     }
@@ -34,6 +36,9 @@ public class SearchFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        String username = UserSession.getUsername(requireContext());
+        adapter = new RecommendationAdapter(new DatabaseHelper(requireContext()), username);
 
         views.results.setLayoutManager(new LinearLayoutManager(requireContext()));
         views.results.setAdapter(adapter);
