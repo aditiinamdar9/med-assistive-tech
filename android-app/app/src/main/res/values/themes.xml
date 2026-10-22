@@ -12,6 +12,7 @@
          A display face reads as a product, not a form, if it's used sparingly. -->
     <style name="TextAppearance.AidFinder.Display" parent="android:TextAppearance">
         <item name="android:fontFamily">@font/abril_fatface_regular</item>
+        <item name="fontFamily">@font/abril_fatface_regular</item>
         <item name="android:letterSpacing">0.01</item>
     </style>
 </resources>
