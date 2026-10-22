@@ -20,9 +20,25 @@ Request:
       "tags": "grip-weakness,arthritis,hands",
       "description": "Chunky rubber handles that slide onto forks and pens."
     }
-  ]
+  ],
+  "user_context": {
+    "age": 34,
+    "height_feet": 5,
+    "height_inches": 6,
+    "weight_lbs": 150,
+    "biological_sex": "Female",
+    "activity_level": "Moderately active"
+  }
 }
 ```
+
+`user_context` is optional and the app omits it entirely when the user has no
+profile data set (not sent as an empty object). It deliberately never
+includes blood pressure or heart rate - those stay on the device. The model
+is instructed to use it only to judge physical fit (size, weight limits,
+grip size), never to guess at a condition. If you add a field here that
+should also stay off-device, don't add it to `UserContext` in `schemas.py` or
+`UserContextDto.java` - keep it out of both.
 
 Response:
 
