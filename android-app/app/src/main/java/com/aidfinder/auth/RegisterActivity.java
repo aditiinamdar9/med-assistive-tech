@@ -1,5 +1,6 @@
 package com.aidfinder.auth;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Button;
@@ -9,8 +10,9 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.aidfinder.auth.db.DatabaseHelper;
+import com.aidfinder.MainActivity;
 import com.aidfinder.R;
+import com.aidfinder.auth.db.DatabaseHelper;
 
 import java.util.Objects;
 
@@ -62,7 +64,12 @@ public class RegisterActivity extends AppCompatActivity {
 
         boolean success = databaseHelper.addUser(username, email, password);
         if (success) {
+            UserSession.saveUsername(this, username);
             Toast.makeText(this, R.string.msg_register_success, Toast.LENGTH_SHORT).show();
+
+            Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+            intent.putExtra("USERNAME", username);
+            startActivity(intent);
             finish();
         } else {
             Toast.makeText(this, "Registration failed. Try again.", Toast.LENGTH_SHORT).show();
