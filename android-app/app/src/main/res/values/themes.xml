@@ -4,5 +4,14 @@
         <item name="colorOnPrimary">@color/white</item>
         <item name="android:colorBackground">@color/paper</item>
         <item name="android:textColorPrimary">@color/ink</item>
+        <item name="android:fontFamily">@font/gelasio_family</item>
+        <item name="fontFamily">@font/gelasio_family</item>
+    </style>
+
+    <!-- For page titles only - not body text, not every bold label.
+         A display face reads as a product, not a form, if it's used sparingly. -->
+    <style name="TextAppearance.AidFinder.Display" parent="android:TextAppearance">
+        <item name="android:fontFamily">@font/abril_fatface_regular</item>
+        <item name="android:letterSpacing">0.01</item>
     </style>
 </resources>

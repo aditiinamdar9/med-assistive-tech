@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="#F8F9FA">
+    android:background="@color/paper">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -14,12 +14,12 @@
         android:gravity="center">
 
         <TextView
+            style="@style/TextAppearance.AidFinder.Display"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/title_register"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            android:textColor="#1A1A1A"
+            android:textSize="30sp"
+            android:textColor="@color/ink"
             android:layout_marginBottom="32dp" />
 
         <com.google.android.material.textfield.TextInputLayout

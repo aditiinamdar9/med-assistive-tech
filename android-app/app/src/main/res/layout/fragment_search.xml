@@ -14,11 +14,11 @@
         android:padding="24dp">
 
         <TextView
+            style="@style/TextAppearance.AidFinder.Display"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/headline"
-            android:textSize="26sp"
-            android:textStyle="bold"
+            android:textSize="28sp"
             android:textColor="@color/ink"
             android:accessibilityHeading="true" />
 
