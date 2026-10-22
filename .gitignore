@@ -19,10 +19,9 @@ venv/
 .idea/
 
 # Android
-android-app/.gradle/
-android-app/build/
-android-app/*/build/
-android-app/local.properties
+.gradle/
+build/
+local.properties
 
 # Misc
 *.zip
