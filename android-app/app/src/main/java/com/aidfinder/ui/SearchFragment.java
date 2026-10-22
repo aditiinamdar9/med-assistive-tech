@@ -1,5 +1,6 @@
 package com.aidfinder.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,6 +43,8 @@ public class SearchFragment extends Fragment {
 
         views.results.setLayoutManager(new LinearLayoutManager(requireContext()));
         views.results.setAdapter(adapter);
+        adapter.setOnItemClickListener(item -> startActivity(
+                DeviceJournalActivity.newIntent(requireContext(), item.product.id, item.product.name)));
 
         model = new ViewModelProvider(this).get(RecommendationViewModel.class);
         model.getState().observe(getViewLifecycleOwner(), this::render);

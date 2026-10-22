@@ -64,4 +64,17 @@
     <string name="cd_remove_favorite">Remove from favorites</string>
     <string name="title_favorites">Favorites</string>
     <string name="msg_no_favorites">You haven\'t favorited anything yet. Star a suggestion from Search to save it here.</string>
+
+    <!-- Device journal -->
+    <string name="title_device_journal">Device journal</string>
+    <string name="label_new_entry">How has it been going?</string>
+    <string name="hint_journal_entry">What have you noticed using this - any benefits, any downsides?</string>
+    <string name="label_rating">How helpful was it this time?</string>
+    <string name="cd_rating_star">Rate %1$d out of 5</string>
+    <string name="btn_save_entry">Save entry</string>
+    <string name="err_rating_required">Pick a rating from 1 to 5 before saving</string>
+    <string name="err_entry_text_required">Write a few words about your experience first</string>
+    <string name="title_entry_history">Past entries</string>
+    <string name="msg_no_entries">No entries yet for this device. Add one above.</string>
+    <string name="title_timeline">Helpfulness over time</string>
 </resources>

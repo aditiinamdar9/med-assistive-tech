@@ -28,5 +28,9 @@
         <activity android:name=".auth.RegisterActivity" android:exported="false" />
         <activity android:name=".auth.HomeActivity" android:exported="false" />
         <activity android:name=".auth.ProfileActivity" android:exported="false" />
+        <activity
+            android:name=".ui.DeviceJournalActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 </manifest>
