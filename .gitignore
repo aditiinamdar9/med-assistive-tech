@@ -10,18 +10,24 @@ __pycache__/
 .venv/
 venv/
 *.egg-info/
+ai-service/uvicorn.log
 
 # OS
 .DS_Store
 
 # Editor
 .vscode/
+.idea/
 
 # Android
+.gradle/
+build/
+local.properties
 android-app/.gradle/
 android-app/build/
 android-app/*/build/
 android-app/local.properties
+tools/venv/
 
 # Misc
 *.zip
