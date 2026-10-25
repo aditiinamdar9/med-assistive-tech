@@ -58,4 +58,10 @@
     <string name="btn_search_products">Find Assistive Products</string>
     <string name="msg_profile_saved">Profile saved successfully!</string>
     <string name="err_invalid_number">Please enter valid numeric values for age, height, or weight</string>
+
+    <!-- Favorites -->
+    <string name="cd_add_favorite">Add to favorites</string>
+    <string name="cd_remove_favorite">Remove from favorites</string>
+    <string name="title_favorites">Favorites</string>
+    <string name="msg_no_favorites">You haven\'t favorited anything yet. Star a suggestion from Search to save it here.</string>
 </resources>

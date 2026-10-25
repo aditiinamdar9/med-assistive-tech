@@ -3,6 +3,7 @@ package com.aidfinder.ui;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.aidfinder.R;
 import com.aidfinder.RecommendationResult;
+import com.aidfinder.auth.db.DatabaseHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +19,19 @@ import java.util.List;
 public class RecommendationAdapter extends RecyclerView.Adapter<RecommendationAdapter.VH> {
 
     private final List<RecommendationResult> items = new ArrayList<>();
+    private final DatabaseHelper databaseHelper;
+    private final String username;
+    private Runnable onFavoriteChanged;
+
+    public RecommendationAdapter(DatabaseHelper databaseHelper, String username) {
+        this.databaseHelper = databaseHelper;
+        this.username = username;
+    }
+
+    /** Called after a favorite is added or removed, so a caller showing only favorites can refresh. */
+    public void setOnFavoriteChanged(Runnable listener) {
+        this.onFavoriteChanged = listener;
+    }
 
     public void submit(List<RecommendationResult> newItems) {
         items.clear();
@@ -42,6 +57,32 @@ public class RecommendationAdapter extends RecyclerView.Adapter<RecommendationAd
         // Screen readers announce the card as one unit instead of three fragments
         holder.itemView.setContentDescription(
                 item.product.name + ". " + item.why + " " + item.product.description);
+
+        bindFavoriteButton(holder.favoriteButton, item);
+    }
+
+    private void bindFavoriteButton(ImageButton button, RecommendationResult item) {
+        boolean favorited = databaseHelper.isFavorite(username, item.product.id);
+        setFavoriteIcon(button, favorited);
+
+        button.setOnClickListener(v -> {
+            boolean nowFavorited = !databaseHelper.isFavorite(username, item.product.id);
+            if (nowFavorited) {
+                databaseHelper.addFavorite(username, item.product.id, item.product.name, item.why);
+            } else {
+                databaseHelper.removeFavorite(username, item.product.id);
+            }
+            setFavoriteIcon(button, nowFavorited);
+            if (onFavoriteChanged != null) {
+                onFavoriteChanged.run();
+            }
+        });
+    }
+
+    private void setFavoriteIcon(ImageButton button, boolean favorited) {
+        button.setImageResource(favorited ? R.drawable.ic_star_filled : R.drawable.ic_star_outline);
+        button.setContentDescription(button.getResources().getString(
+                favorited ? R.string.cd_remove_favorite : R.string.cd_add_favorite));
     }
 
     @Override
@@ -51,12 +92,14 @@ public class RecommendationAdapter extends RecyclerView.Adapter<RecommendationAd
 
     static class VH extends RecyclerView.ViewHolder {
         final TextView name, why, description;
+        final ImageButton favoriteButton;
 
         VH(@NonNull View itemView) {
             super(itemView);
             name = itemView.findViewById(R.id.productName);
             why = itemView.findViewById(R.id.why);
             description = itemView.findViewById(R.id.description);
+            favoriteButton = itemView.findViewById(R.id.favoriteButton);
         }
     }
 }

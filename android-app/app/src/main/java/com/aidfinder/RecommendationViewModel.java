@@ -54,7 +54,7 @@ public class RecommendationViewModel extends AndroidViewModel {
 
         state.setValue(State.LOADING);
 
-        ApiClient.get().recommend(new RecommendRequest(userText, payload))
+        ApiClient.get(getApplication()).recommend(new RecommendRequest(userText, payload))
                 .enqueue(new Callback<RecommendResponse>() {
 
             @Override

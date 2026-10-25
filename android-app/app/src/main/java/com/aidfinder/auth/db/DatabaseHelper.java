@@ -6,12 +6,15 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.aidfinder.auth.model.Favorite;
 import com.aidfinder.auth.model.UserProfile;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -23,6 +26,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_USERNAME = "username";
     private static final String COLUMN_EMAIL = "email";
     private static final String COLUMN_PASSWORD = "password";
+
+    private static final String TABLE_FAVORITES = "favorites";
+    private static final String COLUMN_FAV_USERNAME = "username";
+    private static final String COLUMN_FAV_PRODUCT_ID = "product_id";
+    private static final String COLUMN_FAV_PRODUCT_NAME = "product_name";
+    private static final String COLUMN_FAV_WHY = "why";
 
     // Profile & Vitals columns
     private static final String COLUMN_BIOLOGICAL_SEX = "biological_sex";
@@ -54,10 +63,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + COLUMN_HEART_RATE + " INTEGER,"
                 + COLUMN_ACTIVITY_LEVEL + " TEXT" + ")";
         db.execSQL(CREATE_USERS_TABLE);
+        db.execSQL(CREATE_FAVORITES_TABLE);
     }
+
+    private static final String CREATE_FAVORITES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_FAVORITES + "("
+            + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + COLUMN_FAV_USERNAME + " TEXT,"
+            + COLUMN_FAV_PRODUCT_ID + " TEXT,"
+            + COLUMN_FAV_PRODUCT_NAME + " TEXT,"
+            + COLUMN_FAV_WHY + " TEXT,"
+            + "UNIQUE(" + COLUMN_FAV_USERNAME + ", " + COLUMN_FAV_PRODUCT_ID + "))";
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // Runs unconditionally (not inside the chain below) so it's not skipped
+        // by the existing if/else-if ladder for whichever old version someone
+        // is upgrading from.
+        db.execSQL(CREATE_FAVORITES_TABLE);
+
         if (oldVersion < 2) {
             db.execSQL("ALTER TABLE " + TABLE_USERS + " ADD COLUMN " + COLUMN_BIOLOGICAL_SEX + " TEXT");
             db.execSQL("ALTER TABLE " + TABLE_USERS + " ADD COLUMN " + COLUMN_AGE + " INTEGER");
@@ -143,6 +166,56 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         db.close();
         return resolvedUsername;
+    }
+
+    public boolean addFavorite(String username, String productId, String productName, String why) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_FAV_USERNAME, username);
+        values.put(COLUMN_FAV_PRODUCT_ID, productId);
+        values.put(COLUMN_FAV_PRODUCT_NAME, productName);
+        values.put(COLUMN_FAV_WHY, why);
+
+        long id = db.insertWithOnConflict(TABLE_FAVORITES, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+        db.close();
+        return id != -1;
+    }
+
+    public boolean removeFavorite(String username, String productId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int rows = db.delete(TABLE_FAVORITES,
+                COLUMN_FAV_USERNAME + " = ? AND " + COLUMN_FAV_PRODUCT_ID + " = ?",
+                new String[]{username, productId});
+        db.close();
+        return rows > 0;
+    }
+
+    public boolean isFavorite(String username, String productId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_FAVORITES, new String[]{COLUMN_ID},
+                COLUMN_FAV_USERNAME + " = ? AND " + COLUMN_FAV_PRODUCT_ID + " = ?",
+                new String[]{username, productId}, null, null, null);
+        boolean exists = cursor.getCount() > 0;
+        cursor.close();
+        db.close();
+        return exists;
+    }
+
+    /** Most recently favorited first. */
+    public List<Favorite> getFavorites(String username) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<Favorite> favorites = new ArrayList<>();
+        Cursor cursor = db.query(TABLE_FAVORITES, null, COLUMN_FAV_USERNAME + " = ?",
+                new String[]{username}, null, null, COLUMN_ID + " DESC");
+        while (cursor.moveToNext()) {
+            favorites.add(new Favorite(
+                    getStringValue(cursor, COLUMN_FAV_PRODUCT_ID),
+                    getStringValue(cursor, COLUMN_FAV_PRODUCT_NAME),
+                    getStringValue(cursor, COLUMN_FAV_WHY)));
+        }
+        cursor.close();
+        db.close();
+        return favorites;
     }
 
     public boolean saveUserProfile(UserProfile profile) {

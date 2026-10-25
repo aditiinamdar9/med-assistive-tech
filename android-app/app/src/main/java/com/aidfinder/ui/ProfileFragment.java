@@ -15,10 +15,19 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.aidfinder.R;
+import com.aidfinder.RecommendationResult;
 import com.aidfinder.auth.db.DatabaseHelper;
+import com.aidfinder.auth.model.Favorite;
 import com.aidfinder.auth.model.UserProfile;
+import com.aidfinder.catalog.CatalogRepository;
+import com.aidfinder.catalog.Product;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProfileFragment extends Fragment {
 
@@ -31,6 +40,10 @@ public class ProfileFragment extends Fragment {
     private RadioButton rbFemale, rbMale;
     private EditText etAge, etHeightFeet, etHeightInches, etWeightLbs;
     private EditText etBloodPressure, etHeartRate, etActivityLevel;
+
+    private RecyclerView rvFavorites;
+    private TextView tvNoFavorites;
+    private RecommendationAdapter favoritesAdapter;
 
     private DatabaseHelper databaseHelper;
     private String username = "Saanvi";
@@ -102,9 +115,13 @@ public class ProfileFragment extends Fragment {
         View cardBasicInfo = view.findViewById(R.id.cardBasicInfo);
         View cardVitalsInfo = view.findViewById(R.id.cardVitalsInfo);
 
+        rvFavorites = view.findViewById(R.id.rvFavorites);
+        tvNoFavorites = view.findViewById(R.id.tvNoFavorites);
+
         tvProfileGreeting.setText(getString(R.string.msg_profile_greeting, username));
 
         loadAndDisplayProfileData();
+        setUpFavorites();
 
         View.OnClickListener startEditListener = v -> showEditMode(true);
         btnEditProfile.setOnClickListener(startEditListener);
@@ -185,6 +202,39 @@ public class ProfileFragment extends Fragment {
         } else {
             tvSummaryActivity.setText("Activity Level: Not set");
         }
+    }
+
+    private void setUpFavorites() {
+        favoritesAdapter = new RecommendationAdapter(databaseHelper, username);
+        favoritesAdapter.setOnFavoriteChanged(this::loadFavorites);
+
+        rvFavorites.setLayoutManager(new LinearLayoutManager(requireContext()));
+        rvFavorites.setAdapter(favoritesAdapter);
+
+        loadFavorites();
+    }
+
+    private void loadFavorites() {
+        CatalogRepository catalog = CatalogRepository.get(requireContext());
+        List<Favorite> favorites = databaseHelper.getFavorites(username);
+
+        List<RecommendationResult> results = new ArrayList<>();
+        for (Favorite favorite : favorites) {
+            Product product = catalog.findById(favorite.getProductId());
+            if (product == null) {
+                // Catalog changed since this was favorited - show what we saved
+                // instead of losing the entry.
+                product = new Product();
+                product.id = favorite.getProductId();
+                product.name = favorite.getProductName();
+                product.description = "";
+            }
+            results.add(new RecommendationResult(product, favorite.getWhy()));
+        }
+
+        favoritesAdapter.submit(results);
+        tvNoFavorites.setVisibility(results.isEmpty() ? View.VISIBLE : View.GONE);
+        rvFavorites.setVisibility(results.isEmpty() ? View.GONE : View.VISIBLE);
     }
 
     private void showEditMode(boolean enableEdit) {
