@@ -8,12 +8,16 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.aidfinder.auth.UserSession;
+import com.aidfinder.auth.db.DatabaseHelper;
+import com.aidfinder.auth.model.UserProfile;
 import com.aidfinder.catalog.CatalogRepository;
 import com.aidfinder.catalog.Product;
 import com.aidfinder.net.ApiClient;
 import com.aidfinder.net.dto.CatalogItemDto;
 import com.aidfinder.net.dto.RecommendRequest;
 import com.aidfinder.net.dto.RecommendResponse;
+import com.aidfinder.net.dto.UserContextDto;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -54,7 +58,9 @@ public class RecommendationViewModel extends AndroidViewModel {
 
         state.setValue(State.LOADING);
 
-        ApiClient.get(getApplication()).recommend(new RecommendRequest(userText, payload))
+        UserContextDto context = buildUserContext();
+
+        ApiClient.get(getApplication()).recommend(new RecommendRequest(userText, payload, context))
                 .enqueue(new Callback<RecommendResponse>() {
 
             @Override
@@ -92,5 +98,26 @@ public class RecommendationViewModel extends AndroidViewModel {
                 state.setValue(t instanceof IOException ? State.OFFLINE : State.ERROR);
             }
         });
+    }
+
+    /**
+     * Never blood pressure or heart rate - those stay on the device. Returns
+     * an empty-but-non-null DTO if there's no logged-in user or no profile
+     * yet; RecommendRequest drops it entirely in that case.
+     */
+    private UserContextDto buildUserContext() {
+        String username = UserSession.getUsername(getApplication());
+        if (username.isEmpty()) {
+            return new UserContextDto(null, null, null, null, null, null);
+        }
+
+        UserProfile profile = new DatabaseHelper(getApplication()).getUserProfile(username);
+        return new UserContextDto(
+                profile.getAge() > 0 ? profile.getAge() : null,
+                profile.getHeightFeet() > 0 ? profile.getHeightFeet() : null,
+                profile.getHeightInches() > 0 ? profile.getHeightInches() : null,
+                profile.getWeightLbs() > 0 ? profile.getWeightLbs() : null,
+                profile.getBiologicalSex(),
+                profile.getActivityLevel());
     }
 }
