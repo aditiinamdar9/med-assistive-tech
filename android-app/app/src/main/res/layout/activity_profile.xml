@@ -12,6 +12,16 @@
         android:orientation="vertical"
         android:padding="24dp">
 
+        <Button
+            android:id="@+id/btnBack"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_back"
+            android:textColor="@color/ink"
+            app:strokeColor="@color/line"
+            android:layout_marginBottom="16dp" />
+
         <!-- Greeting Header -->
         <TextView
             android:id="@+id/tvProfileGreeting"

@@ -72,6 +72,11 @@ public class DeviceJournalActivity extends AppCompatActivity {
         TextView tvDeviceName = findViewById(R.id.tvDeviceName);
         tvDeviceName.setText(productName);
 
+        Button btnBack = findViewById(R.id.btnBack);
+        if (btnBack != null) {
+            btnBack.setOnClickListener(v -> finish());
+        }
+
         etEntryText = findViewById(R.id.etEntryText);
         ratingStarsRow = findViewById(R.id.ratingStars);
         Button btnSaveEntry = findViewById(R.id.btnSaveEntry);

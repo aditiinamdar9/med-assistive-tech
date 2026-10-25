@@ -43,6 +43,10 @@ public class ProfileActivity extends AppCompatActivity {
         etHeartRate = findViewById(R.id.etHeartRate);
         etActivityLevel = findViewById(R.id.etActivityLevel);
         Button btnSaveProfile = findViewById(R.id.btnSaveProfile);
+        Button btnBack = findViewById(R.id.btnBack);
+        if (btnBack != null) {
+            btnBack.setOnClickListener(v -> finish());
+        }
 
         username = getIntent().getStringExtra("USERNAME");
         if (username == null || username.trim().isEmpty()) {

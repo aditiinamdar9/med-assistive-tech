@@ -14,7 +14,7 @@ from openai import APIError, OpenAI
 
 from .config import settings
 from .prompts import SYSTEM_PROMPT
-from .schemas import CatalogItem, Recommendation, RecommendRequest
+from .schemas import CatalogItem, Recommendation, RecommendRequest, UserContext
 
 log = logging.getLogger(__name__)
 _client: OpenAI | None = None
@@ -34,6 +34,30 @@ def _catalog_block(catalog: list[CatalogItem]) -> str:
         f"- id={c.id} | {c.name} | {c.category} | tags: {c.tags} | {c.description}"
         for c in catalog
     )
+
+
+def _context_block(context: UserContext | None) -> str:
+    """Empty string if there's nothing to say - never pad the prompt with
+    "Age: unknown" noise. Deliberately excludes blood pressure and heart
+    rate - see UserContext's docstring."""
+    if context is None:
+        return ""
+
+    parts = []
+    if context.age:
+        parts.append(f"Age: {context.age}")
+    if context.height_feet or context.height_inches:
+        parts.append(f"Height: {context.height_feet or 0} ft {context.height_inches or 0} in")
+    if context.weight_lbs:
+        parts.append(f"Weight: {context.weight_lbs} lbs")
+    if context.biological_sex:
+        parts.append(f"Biological sex: {context.biological_sex}")
+    if context.activity_level:
+        parts.append(f"Activity level: {context.activity_level}")
+
+    if not parts:
+        return ""
+    return "\n\nThe person's physical details (use only for physical fit):\n" + "\n".join(parts)
 
 
 def _parse(raw: str) -> list[dict]:
@@ -56,6 +80,7 @@ def recommend(req: RecommendRequest) -> list[Recommendation]:
     user_message = (
         f"Catalog:\n{_catalog_block(req.catalog)}\n\n"
         f"The person said:\n{req.user_text}"
+        f"{_context_block(req.user_context)}"
     )
 
     try:

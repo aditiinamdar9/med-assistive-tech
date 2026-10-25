@@ -59,6 +59,9 @@
     <string name="msg_profile_saved">Profile saved successfully!</string>
     <string name="err_invalid_number">Please enter valid numeric values for age, height, or weight</string>
 
+    <!-- Back Button -->
+    <string name="btn_back">← Back</string>
+
     <!-- Favorites -->
     <string name="cd_add_favorite">Add to favorites</string>
     <string name="cd_remove_favorite">Remove from favorites</string>

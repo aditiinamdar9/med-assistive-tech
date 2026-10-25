@@ -13,6 +13,17 @@
         android:padding="24dp"
         android:gravity="center">
 
+        <Button
+            android:id="@+id/btnBack"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_back"
+            android:textColor="@color/ink"
+            app:strokeColor="@color/line"
+            android:layout_gravity="start"
+            android:layout_marginBottom="16dp" />
+
         <TextView
             style="@style/TextAppearance.AidFinder.Display"
             android:layout_width="wrap_content"
