@@ -1,5 +1,6 @@
 package com.aidfinder.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -207,6 +208,8 @@ public class ProfileFragment extends Fragment {
     private void setUpFavorites() {
         favoritesAdapter = new RecommendationAdapter(databaseHelper, username);
         favoritesAdapter.setOnFavoriteChanged(this::loadFavorites);
+        favoritesAdapter.setOnItemClickListener(item -> startActivity(
+                DeviceJournalActivity.newIntent(requireContext(), item.product.id, item.product.name)));
 
         rvFavorites.setLayoutManager(new LinearLayoutManager(requireContext()));
         rvFavorites.setAdapter(favoritesAdapter);

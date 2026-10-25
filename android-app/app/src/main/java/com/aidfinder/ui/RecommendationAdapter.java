@@ -18,10 +18,15 @@ import java.util.List;
 
 public class RecommendationAdapter extends RecyclerView.Adapter<RecommendationAdapter.VH> {
 
+    public interface OnItemClickListener {
+        void onItemClick(RecommendationResult item);
+    }
+
     private final List<RecommendationResult> items = new ArrayList<>();
     private final DatabaseHelper databaseHelper;
     private final String username;
     private Runnable onFavoriteChanged;
+    private OnItemClickListener onItemClick;
 
     public RecommendationAdapter(DatabaseHelper databaseHelper, String username) {
         this.databaseHelper = databaseHelper;
@@ -31,6 +36,11 @@ public class RecommendationAdapter extends RecyclerView.Adapter<RecommendationAd
     /** Called after a favorite is added or removed, so a caller showing only favorites can refresh. */
     public void setOnFavoriteChanged(Runnable listener) {
         this.onFavoriteChanged = listener;
+    }
+
+    /** Called when the card body (not the star button) is tapped - e.g. to open its device journal. */
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.onItemClick = listener;
     }
 
     public void submit(List<RecommendationResult> newItems) {
@@ -59,6 +69,12 @@ public class RecommendationAdapter extends RecyclerView.Adapter<RecommendationAd
                 item.product.name + ". " + item.why + " " + item.product.description);
 
         bindFavoriteButton(holder.favoriteButton, item);
+
+        holder.itemView.setOnClickListener(v -> {
+            if (onItemClick != null) {
+                onItemClick.onItemClick(item);
+            }
+        });
     }
 
     private void bindFavoriteButton(ImageButton button, RecommendationResult item) {

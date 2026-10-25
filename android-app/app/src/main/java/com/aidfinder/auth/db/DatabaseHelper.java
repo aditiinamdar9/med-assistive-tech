@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.aidfinder.auth.model.Favorite;
+import com.aidfinder.auth.model.JournalEntry;
 import com.aidfinder.auth.model.UserProfile;
 
 import java.nio.charset.StandardCharsets;
@@ -19,7 +20,7 @@ import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "UserDatabase.db";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
 
     private static final String TABLE_USERS = "users";
     private static final String COLUMN_ID = "id";
@@ -32,6 +33,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_FAV_PRODUCT_ID = "product_id";
     private static final String COLUMN_FAV_PRODUCT_NAME = "product_name";
     private static final String COLUMN_FAV_WHY = "why";
+
+    private static final String TABLE_JOURNAL = "journal_entries";
+    private static final String COLUMN_JOURNAL_USERNAME = "username";
+    private static final String COLUMN_JOURNAL_PRODUCT_ID = "product_id";
+    private static final String COLUMN_JOURNAL_PRODUCT_NAME = "product_name";
+    private static final String COLUMN_JOURNAL_TEXT = "entry_text";
+    private static final String COLUMN_JOURNAL_RATING = "rating";
+    private static final String COLUMN_JOURNAL_CREATED_AT = "created_at";
 
     // Profile & Vitals columns
     private static final String COLUMN_BIOLOGICAL_SEX = "biological_sex";
@@ -64,6 +73,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + COLUMN_ACTIVITY_LEVEL + " TEXT" + ")";
         db.execSQL(CREATE_USERS_TABLE);
         db.execSQL(CREATE_FAVORITES_TABLE);
+        db.execSQL(CREATE_JOURNAL_TABLE);
     }
 
     private static final String CREATE_FAVORITES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_FAVORITES + "("
@@ -74,12 +84,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + COLUMN_FAV_WHY + " TEXT,"
             + "UNIQUE(" + COLUMN_FAV_USERNAME + ", " + COLUMN_FAV_PRODUCT_ID + "))";
 
+    // No UNIQUE constraint - this is an append-only log, not one row per device.
+    private static final String CREATE_JOURNAL_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_JOURNAL + "("
+            + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + COLUMN_JOURNAL_USERNAME + " TEXT,"
+            + COLUMN_JOURNAL_PRODUCT_ID + " TEXT,"
+            + COLUMN_JOURNAL_PRODUCT_NAME + " TEXT,"
+            + COLUMN_JOURNAL_TEXT + " TEXT,"
+            + COLUMN_JOURNAL_RATING + " INTEGER,"
+            + COLUMN_JOURNAL_CREATED_AT + " INTEGER)";
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Runs unconditionally (not inside the chain below) so it's not skipped
-        // by the existing if/else-if ladder for whichever old version someone
-        // is upgrading from.
+        // Both run unconditionally (not inside the chain below) so they're not
+        // skipped by the existing if/else-if ladder for whichever old version
+        // someone is upgrading from.
         db.execSQL(CREATE_FAVORITES_TABLE);
+        db.execSQL(CREATE_JOURNAL_TABLE);
 
         if (oldVersion < 2) {
             db.execSQL("ALTER TABLE " + TABLE_USERS + " ADD COLUMN " + COLUMN_BIOLOGICAL_SEX + " TEXT");
@@ -216,6 +237,43 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         db.close();
         return favorites;
+    }
+
+    public boolean addJournalEntry(String username, String productId, String productName,
+                                    String entryText, int rating) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_JOURNAL_USERNAME, username);
+        values.put(COLUMN_JOURNAL_PRODUCT_ID, productId);
+        values.put(COLUMN_JOURNAL_PRODUCT_NAME, productName);
+        values.put(COLUMN_JOURNAL_TEXT, entryText);
+        values.put(COLUMN_JOURNAL_RATING, rating);
+        values.put(COLUMN_JOURNAL_CREATED_AT, System.currentTimeMillis());
+
+        long id = db.insert(TABLE_JOURNAL, null, values);
+        db.close();
+        return id != -1;
+    }
+
+    /** Oldest first - the order a timeline reads left to right. */
+    public List<JournalEntry> getJournalEntries(String username, String productId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<JournalEntry> entries = new ArrayList<>();
+        Cursor cursor = db.query(TABLE_JOURNAL, null,
+                COLUMN_JOURNAL_USERNAME + " = ? AND " + COLUMN_JOURNAL_PRODUCT_ID + " = ?",
+                new String[]{username, productId}, null, null, COLUMN_JOURNAL_CREATED_AT + " ASC");
+        while (cursor.moveToNext()) {
+            entries.add(new JournalEntry(
+                    cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_ID)),
+                    getStringValue(cursor, COLUMN_JOURNAL_PRODUCT_ID),
+                    getStringValue(cursor, COLUMN_JOURNAL_PRODUCT_NAME),
+                    getStringValue(cursor, COLUMN_JOURNAL_TEXT),
+                    getIntValue(cursor, COLUMN_JOURNAL_RATING),
+                    cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_JOURNAL_CREATED_AT))));
+        }
+        cursor.close();
+        db.close();
+        return entries;
     }
 
     public boolean saveUserProfile(UserProfile profile) {
